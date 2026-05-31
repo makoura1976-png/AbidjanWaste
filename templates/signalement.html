@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbidjanWaste — Signalement</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        header {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 20px;
+        }
+        header h1 { font-size: 20px; }
+        header p { font-size: 13px; opacity: 0.85; }
+        .container {
+            max-width: 700px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .form-header {
+            background: #e8f5e9;
+            padding: 20px;
+            border-bottom: 1px solid #c8e6c9;
+        }
+        .form-header h2 { color: #2e7d32; font-size: 18px; }
+        .form-header p { color: #555; font-size: 13px; margin-top: 4px; }
+        .form-body { padding: 25px; }
+        .form-group { margin-bottom: 20px; }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 14px;
+        }
+        select, textarea, input[type="file"] {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafafa;
+        }
+        select:focus, textarea:focus {
+            outline: none;
+            border-color: #2e7d32;
+            background: white;
+        }
+        textarea { resize: vertical; min-height: 100px; }
+        #map-picker {
+            height: 250px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            margin-top: 8px;
+        }
+        .coords-display {
+            margin-top: 8px;
+            font-size: 12px;
+            color: #666;
+            background: #f5f5f5;
+            padding: 6px 10px;
+            border-radius: 6px;
+        }
+        .btn-localiser {
+            background: #1976d2;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-bottom: 8px;
+        }
+        .btn-submit {
+            width: 100%;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .btn-submit:hover { background: #1b5e20; }
+        .nav-links {
+            display: flex;
+            gap: 15px;
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-top: 1px solid #eee;
+        }
+        .nav-links a {
+            color: #2e7d32;
+            text-decoration: none;
+            font-size: 13px;
+        }
+        #success-msg {
+            display: none;
+            background: #e8f5e9;
+            border: 1px solid #4caf50;
+            color: #2e7d32;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>🗑️ AbidjanWaste — Signalement citoyen</h1>
+    <p>Signalez un problème de collecte dans votre quartier</p>
+</header>
+
+<div class="container">
+    <div class="form-header">
+        <h2>📋 Nouveau signalement</h2>
+        <p>Remplissez le formulaire ci-dessous. Votre signalement sera traité rapidement.</p>
+    </div>
+
+    <div class="form-body">
+        <div id="success-msg">✅ Votre signalement a été envoyé avec succès !</div>
+
+        <div class="form-group">
+            <label>Type de problème *</label>
+            <select id="type_signalement">
+                <option value="">-- Choisissez --</option>
+                <option value="poubelle_pleine">🗑️ Poubelle pleine</option>
+                <option value="depot_sauvage">⚠️ Dépôt sauvage</option>
+                <option value="retard_collecte">🕐 Retard de collecte</option>
+                <option value="autre">📌 Autre</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>Description *</label>
+            <textarea id="description" placeholder="Décrivez le problème en détail..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Commune *</label>
+            <select id="commune"></select>
+        </div>
+
+        <div class="form-group">
+            <label>📍 Localisation</label>
+            <button class="btn-localiser" onclick="maPosition()">📡 Utiliser ma position GPS</button>
+            <div id="map-picker"></div>
+            <div class="coords-display" id="coords-display">
+                Cliquez sur la carte ou utilisez le GPS pour sélectionner la position
+            </div>
+            <input type="hidden" id="latitude" value="">
+            <input type="hidden" id="longitude" value="">
+        </div>
+
+        <div class="form-group">
+            <label>📷 Photo (optionnel)</label>
+            <input type="file" id="photo" accept="image/*">
+        </div>
+
+        <button class="btn-submit" onclick="envoyerSignalement()">
+            🚀 Envoyer le signalement
+        </button>
+    </div>
+
+    <div class="nav-links">
+        <a href="/carte/">🗺️ Voir la carte</a>
+        <a href="/admin/">⚙️ Administration</a>
+    </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // Initialiser la carte
+    const map = L.map('map-picker').setView([5.3600, -4.0083], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    let marker = null;
+
+    map.on('click', function(e) {
+        setPosition(e.latlng.lat, e.latlng.lng);
+    });
+
+    function setPosition(lat, lng) {
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lng;
+        document.getElementById('coords-display').textContent =
+            `📍 Position : ${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        if (marker) map.removeLayer(marker);
+        marker = L.marker([lat, lng]).addTo(map);
+    }
+
+    function maPosition() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(pos => {
+                setPosition(pos.coords.latitude, pos.coords.longitude);
+                map.setView([pos.coords.latitude, pos.coords.longitude], 16);
+            });
+        }
+    }
+
+    // Charger les communes
+    fetch('/api/communes/')
+        .then(r => r.json())
+        .then(data => {
+            const sel = document.getElementById('commune');
+            data.forEach(c => {
+                sel.innerHTML += `<option value="${c.id}">${c.nom}</option>`;
+            });
+        });
+
+    // Envoyer le signalement
+    function envoyerSignalement() {
+        const type = document.getElementById('type_signalement').value;
+        const description = document.getElementById('description').value;
+        const commune = document.getElementById('commune').value;
+        const lat = document.getElementById('latitude').value;
+        const lng = document.getElementById('longitude').value;
+
+        if (!type || !description || !lat || !lng) {
+            alert('Veuillez remplir tous les champs obligatoires et sélectionner une position.');
+            return;
+        }
+
+        const data = {
+            type_signalement: type,
+            description: description,
+            commune: commune,
+            latitude: parseFloat(lat),
+            longitude: parseFloat(lng),
+            statut: 'en_attente'
+        };
+
+        fetch('/api/signalements/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+        .then(r => r.json())
+        .then(() => {
+            document.getElementById('success-msg').style.display = 'block';
+            window.scrollTo(0, 0);
+        })
+        .catch(() => alert('Erreur lors de l\'envoi.'));
+    }
+</script>
+
+</body>
+</html>

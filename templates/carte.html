@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbidjanWaste — Carte des poubelles</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        header {
+            background: #2e7d32;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        header h1 { font-size: 20px; }
+        header p { font-size: 13px; opacity: 0.85; }
+        #map { height: calc(100vh - 130px); width: 100%; }
+        #legende {
+            background: white;
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+        .leg-item { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+        .leg-dot {
+            width: 14px; height: 14px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+        .vide { background: #4caf50; }
+        .pleine { background: #f44336; }
+        .endommagee { background: #ff9800; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div>
+        <h1>🗺️ AbidjanWaste — Carte des points de collecte</h1>
+        <p>Visualisation en temps réel des poubelles par commune</p>
+    </div>
+</header>
+
+<div id="map"></div>
+
+<div id="legende">
+    <strong>Légende :</strong>
+    <div class="leg-item"><div class="leg-dot vide"></div> Vide</div>
+    <div class="leg-item"><div class="leg-dot pleine"></div> Pleine</div>
+    <div class="leg-item"><div class="leg-dot endommagee"></div> Endommagée</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    const map = L.map('map').setView([5.3600, -4.0083], 12);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap contributors'
+    }).addTo(map);
+
+    const couleurs = {
+        'vide': '#4caf50',
+        'pleine': '#f44336',
+        'endommagee': '#ff9800'
+    };
+
+    function creerIcone(etat) {
+        const couleur = couleurs[etat] || '#999';
+        return L.divIcon({
+            className: '',
+            html: `<div style="
+                width:22px; height:22px;
+                background:${couleur};
+                border-radius:50%;
+                border:3px solid white;
+                box-shadow:0 2px 6px rgba(0,0,0,0.4);
+            "></div>`,
+            iconSize: [22, 22],
+            iconAnchor: [11, 11]
+        });
+    }
+
+    // Charger les poubelles depuis l'API
+    fetch('/api/poubelles/')
+        .then(res => res.json())
+        .then(data => {
+            data.forEach(p => {
+                const marker = L.marker(
+                    [p.latitude, p.longitude],
+                    { icon: creerIcone(p.etat) }
+                ).addTo(map);
+
+                marker.bindPopup(`
+                    <b>${p.nom}</b><br>
+                    État : <strong>${p.etat}</strong><br>
+                    Mise à jour : ${new Date(p.date_mise_a_jour).toLocaleDateString('fr-FR')}
+                `);
+            });
+        });
+</script>
+
+</body>
+</html>
