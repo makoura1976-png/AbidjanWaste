@@ -54,11 +54,24 @@ def logout_api(request):
 
 def profil_api(request):
     if request.user.is_authenticated:
+        try:
+            from signalements.models import ProfilCitoyen
+            profil = ProfilCitoyen.objects.get(user=request.user)
+            points = profil.points
+            badge = profil.badge
+            rang = ProfilCitoyen.objects.filter(points__gt=points).count() + 1
+        except Exception:
+            points = 0
+            badge = '🌱 Débutant'
+            rang = None
         return JsonResponse({
             'authenticated': True,
             'username': request.user.username,
             'email': request.user.email,
             'first_name': request.user.first_name,
             'last_name': request.user.last_name,
+            'points': points,
+            'badge': badge,
+            'rang': rang,
         })
     return JsonResponse({'authenticated': False})

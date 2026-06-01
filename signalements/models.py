@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class Commune(models.Model):
     nom = models.CharField(max_length=100)
@@ -10,6 +12,38 @@ class Commune(models.Model):
 
     class Meta:
         verbose_name = "Commune"
+
+class ProfilCitoyen(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    points = models.IntegerField(default=0)
+    commune = models.ForeignKey('Commune', on_delete=models.SET_NULL, null=True, blank=True)
+    badge = models.CharField(max_length=50, default='Débutant')
+
+    def mettre_a_jour_badge(self):
+        if self.points >= 500:
+            self.badge = '🏆 Champion'
+        elif self.points >= 200:
+            self.badge = '⭐ Expert'
+        elif self.points >= 100:
+            self.badge = '🥈 Actif'
+        elif self.points >= 50:
+            self.badge = '🥉 Engagé'
+        else:
+            self.badge = '🌱 Débutant'
+        self.save()
+
+    def __str__(self):
+        return f"{self.user.username} — {self.points} pts"
+
+@receiver(post_save, sender=User)
+def creer_profil(sender, instance, created, **kwargs):
+    if created:
+        ProfilCitoyen.objects.create(user=instance)
+
+@receiver(post_save, sender=User)
+def sauvegarder_profil(sender, instance, **kwargs):
+    if hasattr(instance, 'profilcitoyen'):
+        instance.profilcitoyen.save()
 
 class Poubelle(models.Model):
     ETAT_CHOICES = [
@@ -49,9 +83,24 @@ class Signalement(models.Model):
     commune = models.ForeignKey(Commune, on_delete=models.SET_NULL, null=True, blank=True)
     date_creation = models.DateTimeField(auto_now_add=True)
     date_resolution = models.DateTimeField(null=True, blank=True)
+    points_attribues = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.type_signalement} — {self.statut}"
 
     class Meta:
         ordering = ['-date_creation']
+
+    def save(self, *args, **kwargs):
+        if self.statut == 'resolu' and not self.points_attribues and self.citoyen:
+            super().save(*args, **kwargs)
+            try:
+                profil = self.citoyen.profilcitoyen
+                profil.points += 10
+                profil.mettre_a_jour_badge()
+            except:
+                pass
+            self.points_attribues = True
+            super().save(*args, **kwargs)
+        else:
+            super().save(*args, **kwargs)

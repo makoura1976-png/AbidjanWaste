@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AbidjanWaste — Gestion intelligente des déchets</title>
+    <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; color: #333; }
         header {
             background: #2e7d32;
@@ -19,7 +19,7 @@
         .logo { display: flex; align-items: center; gap: 12px; }
         .logo h1 { font-size: 20px; }
         .logo p { font-size: 11px; opacity: 0.8; }
-        nav { display: flex; gap: 8px; }
+        nav { display: flex; gap: 6px; flex-wrap: wrap; }
         nav a {
             color: white;
             text-decoration: none;
@@ -29,6 +29,11 @@
             background: rgba(255,255,255,0.15);
         }
         nav a:hover { background: rgba(255,255,255,0.3); }
+        nav a.btn-register {
+            background: white;
+            color: #2e7d32;
+            font-weight: bold;
+        }
         .hero {
             background: #2e7d32;
             color: white;
@@ -62,6 +67,7 @@
             display: flex;
             justify-content: center;
             gap: 60px;
+            flex-wrap: wrap;
         }
         .stat-item { text-align: center; }
         .stat-value { font-size: 32px; font-weight: bold; color: #2e7d32; }
@@ -119,6 +125,15 @@
         }
         .step h4 { font-size: 14px; color: #333; margin-bottom: 6px; }
         .step p { font-size: 12px; color: #888; line-height: 1.5; }
+        .cta-section {
+            background: #2e7d32;
+            color: white;
+            padding: 50px 30px;
+            text-align: center;
+        }
+        .cta-section h2 { font-size: 28px; margin-bottom: 12px; }
+        .cta-section p { font-size: 15px; opacity: 0.9; margin-bottom: 25px; }
+        .cta-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
         footer {
             background: #1b5e20;
             color: white;
@@ -126,13 +141,14 @@
             text-align: center;
         }
         footer p { opacity: 0.8; font-size: 13px; margin-bottom: 8px; }
-        .footer-links { display: flex; gap: 20px; justify-content: center; margin-top: 12px; }
+        .footer-links { display: flex; gap: 20px; justify-content: center; margin-top: 12px; flex-wrap: wrap; }
         .footer-links a { color: rgba(255,255,255,0.7); text-decoration: none; font-size: 13px; }
         .footer-links a:hover { color: white; }
     </style>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
     <div class="logo">
         <div>
@@ -147,19 +163,23 @@
         <a href="/chatbot/">🤖 Chatbot</a>
         <a href="/dashboard/">📊 Dashboard</a>
         <a href="/admin/">⚙️ Admin</a>
+        <a href="/login/">🔐 Connexion</a>
+        <a href="/register/" class="btn-register">📝 S'inscrire</a>
     </nav>
 </header>
 
+<!-- HERO -->
 <div class="hero">
     <h2>🌍 Abidjan plus propre, ensemble</h2>
     <p>Signalez les problèmes de collecte, suivez l'état des poubelles et communiquez avec les éboueurs en temps réel.</p>
     <div class="hero-buttons">
-        <a href="/signalement/" class="btn-primary">📋 Faire un signalement</a>
+        <a href="/register/" class="btn-primary">📝 Créer un compte</a>
+        <a href="/signalement/" class="btn-secondary">📋 Faire un signalement</a>
         <a href="/carte/" class="btn-secondary">🗺️ Voir la carte</a>
-        <a href="/chatbot/" class="btn-secondary">🤖 Assistant IA</a>
     </div>
 </div>
 
+<!-- STATS -->
 <div class="stats">
     <div class="stat-item">
         <div class="stat-value" id="stat-signalements">—</div>
@@ -179,6 +199,7 @@
     </div>
 </div>
 
+<!-- FONCTIONNALITÉS -->
 <div class="section">
     <h2 class="section-title">Nos fonctionnalités</h2>
     <p class="section-subtitle">Une plateforme complète pour une ville plus propre</p>
@@ -207,21 +228,22 @@
             <p>Statistiques, KPIs et suivi des zones critiques en temps réel.</p>
             <span class="feature-btn" style="background:#f3e5f5;color:#6a1b9a">Voir stats →</span>
         </a>
+        <a href="/register/" class="feature-card">
+            <div class="feature-icon" style="background:#e8f5e9">👤</div>
+            <h3>Espace citoyen</h3>
+            <p>Créez votre compte, suivez vos signalements et restez informé.</p>
+            <span class="feature-btn" style="background:#e8f5e9;color:#2e7d32">S'inscrire →</span>
+        </a>
         <a href="/admin/" class="feature-card">
             <div class="feature-icon" style="background:#fce4ec">⚙️</div>
             <h3>Administration</h3>
             <p>Gérez communes, poubelles et signalements depuis un panneau centralisé.</p>
             <span class="feature-btn" style="background:#fce4ec;color:#880e4f">Gérer →</span>
         </a>
-        <div class="feature-card">
-            <div class="feature-icon" style="background:#e8eaf6">🔔</div>
-            <h3>Notifications temps réel</h3>
-            <p>Les éboueurs reçoivent des alertes dès qu'un signalement est créé dans leur zone.</p>
-            <span class="feature-btn" style="background:#e8eaf6;color:#283593">Bientôt →</span>
-        </div>
     </div>
 </div>
 
+<!-- COMMENT ÇA MARCHE -->
 <div class="how-section">
     <div class="how-inner">
         <h2 class="section-title">Comment ça marche ?</h2>
@@ -229,33 +251,44 @@
         <div class="steps">
             <div class="step">
                 <div class="step-num">1</div>
-                <h4>Vous signalez</h4>
-                <p>Photo, localisation et type de problème en quelques secondes.</p>
+                <h4>Créez votre compte</h4>
+                <p>Inscrivez-vous gratuitement en quelques secondes.</p>
             </div>
             <div class="step">
                 <div class="step-num">2</div>
-                <h4>Éboueur notifié</h4>
-                <p>Le responsable de zone reçoit une alerte immédiate.</p>
+                <h4>Vous signalez</h4>
+                <p>Photo, localisation et type de problème.</p>
             </div>
             <div class="step">
                 <div class="step-num">3</div>
-                <h4>Prise en charge</h4>
-                <p>L'éboueur confirme et intervient rapidement.</p>
+                <h4>Éboueur notifié</h4>
+                <p>Le responsable reçoit une alerte immédiate.</p>
             </div>
             <div class="step">
                 <div class="step-num">4</div>
                 <h4>Résolution</h4>
-                <p>Confirmation envoyée quand le problème est résolu.</p>
+                <p>Confirmation envoyée quand c'est résolu.</p>
             </div>
             <div class="step">
                 <div class="step-num">5</div>
                 <h4>Analyse</h4>
-                <p>La mairie suit les statistiques pour améliorer le service.</p>
+                <p>La mairie suit les stats pour améliorer le service.</p>
             </div>
         </div>
     </div>
 </div>
 
+<!-- CTA -->
+<div class="cta-section">
+    <h2>🚀 Rejoignez AbidjanWaste dès aujourd'hui !</h2>
+    <p>Ensemble, rendons Abidjan plus propre et plus verte.</p>
+    <div class="cta-buttons">
+        <a href="/register/" class="btn-primary">📝 Créer un compte gratuit</a>
+        <a href="/signalement/" class="btn-secondary">📋 Faire un signalement</a>
+    </div>
+</div>
+
+<!-- FOOTER -->
 <footer>
     <p>🗑️ <strong>AbidjanWaste</strong> — Plateforme de gestion intelligente des déchets</p>
     <p>Ville d'Abidjan · Côte d'Ivoire</p>
@@ -264,6 +297,8 @@
         <a href="/signalement/">Signalement</a>
         <a href="/chatbot/">Chatbot</a>
         <a href="/dashboard/">Dashboard</a>
+        <a href="/login/">Connexion</a>
+        <a href="/register/">Inscription</a>
         <a href="/admin/">Administration</a>
     </div>
 </footer>
