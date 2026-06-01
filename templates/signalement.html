@@ -9,13 +9,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: Arial, sans-serif; background: #f0f2f5; }
-        header {
-            background: #2e7d32;
-            color: white;
-            padding: 15px 20px;
-        }
-        header h1 { font-size: 20px; }
-        header p { font-size: 13px; opacity: 0.85; }
         .container {
             max-width: 700px;
             margin: 30px auto;
@@ -97,11 +90,7 @@
             background: #f9f9f9;
             border-top: 1px solid #eee;
         }
-        .nav-links a {
-            color: #2e7d32;
-            text-decoration: none;
-            font-size: 13px;
-        }
+        .nav-links a { color: #2e7d32; text-decoration: none; font-size: 13px; }
         #success-msg {
             display: none;
             background: #e8f5e9;
@@ -113,14 +102,46 @@
             text-align: center;
             font-weight: bold;
         }
+        .photo-preview {
+            margin-top: 10px;
+            display: none;
+        }
+        .photo-preview img {
+            width: 100%;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 2px solid #c8e6c9;
+        }
+        @keyframes tomber {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes pulse-whatsapp {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(37,211,102,0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 4px 25px rgba(37,211,102,0.6); }
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>🗑️ AbidjanWaste — Signalement citoyen</h1>
-    <p>Signalez un problème de collecte dans votre quartier</p>
-</header>
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <div>
+            <h1>🗑️ AbidjanWaste</h1>
+            <p>Gestion intelligente des déchets</p>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <a href="/">🏠 Accueil</a>
+        <a href="/carte/">🗺️ Carte</a>
+        <a href="/signalement/" class="active">📋 Signaler</a>
+        <a href="/chatbot/">🤖 Chatbot</a>
+        <a href="/classement/">🏆 Classement</a>
+        <a href="/login/">🔐 Connexion</a>
+        <a href="/register/" style="background:rgba(255,255,255,0.3);font-weight:bold;">📝 S'inscrire</a>
+    </div>
+</nav>
 
 <div class="container">
     <div class="form-header">
@@ -129,7 +150,9 @@
     </div>
 
     <div class="form-body">
-        <div id="success-msg">✅ Votre signalement a été envoyé avec succès !</div>
+        <div id="success-msg">
+            ✅ Votre signalement a été envoyé avec succès ! Merci pour votre contribution 🎉
+        </div>
 
         <div class="form-group">
             <label>Type de problème *</label>
@@ -154,7 +177,9 @@
 
         <div class="form-group">
             <label>📍 Localisation</label>
-            <button class="btn-localiser" onclick="maPosition()">📡 Utiliser ma position GPS</button>
+            <button class="btn-localiser" onclick="maPosition()">
+                📡 Utiliser ma position GPS
+            </button>
             <div id="map-picker"></div>
             <div class="coords-display" id="coords-display">
                 Cliquez sur la carte ou utilisez le GPS pour sélectionner la position
@@ -164,8 +189,11 @@
         </div>
 
         <div class="form-group">
-            <label>📷 Photo (optionnel)</label>
-            <input type="file" id="photo" accept="image/*">
+            <label>📷 Photo de la poubelle (recommandé)</label>
+            <input type="file" id="photo" accept="image/*" onchange="previewPhoto(this)">
+            <div class="photo-preview" id="photo-preview">
+                <img id="photo-img" src="" alt="Aperçu photo">
+            </div>
         </div>
 
         <button class="btn-submit" onclick="envoyerSignalement()">
@@ -175,13 +203,34 @@
 
     <div class="nav-links">
         <a href="/carte/">🗺️ Voir la carte</a>
+        <a href="/classement/">🏆 Classement</a>
         <a href="/admin/">⚙️ Administration</a>
     </div>
 </div>
 
+<!-- Bouton WhatsApp flottant -->
+<a href="https://wa.me/2250000000000?text=Bonjour%20AbidjanWaste%2C%20je%20souhaite%20signaler%20un%20problème%20de%20collecte."
+   target="_blank"
+   style="
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 56px;
+    height: 56px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(37,211,102,0.4);
+    z-index: 1000;
+    text-decoration: none;
+    font-size: 28px;
+    animation: pulse-whatsapp 2s infinite;
+   ">📱</a>
+
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // Initialiser la carte
     const map = L.map('map-picker').setView([5.3600, -4.0083], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
@@ -209,7 +258,17 @@
         }
     }
 
-    // Charger les communes
+    function previewPhoto(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('photo-img').src = e.target.result;
+                document.getElementById('photo-preview').style.display = 'block';
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
     fetch('/api/communes/')
         .then(r => r.json())
         .then(data => {
@@ -219,39 +278,60 @@
             });
         });
 
-    // Envoyer le signalement
     function envoyerSignalement() {
         const type = document.getElementById('type_signalement').value;
         const description = document.getElementById('description').value;
         const commune = document.getElementById('commune').value;
         const lat = document.getElementById('latitude').value;
         const lng = document.getElementById('longitude').value;
+        const photo = document.getElementById('photo').files[0];
 
         if (!type || !description || !lat || !lng) {
             alert('Veuillez remplir tous les champs obligatoires et sélectionner une position.');
             return;
         }
 
-        const data = {
-            type_signalement: type,
-            description: description,
-            commune: commune,
-            latitude: parseFloat(lat),
-            longitude: parseFloat(lng),
-            statut: 'en_attente'
-        };
+        const formData = new FormData();
+        formData.append('type_signalement', type);
+        formData.append('description', description);
+        formData.append('commune', commune);
+        formData.append('latitude', parseFloat(lat));
+        formData.append('longitude', parseFloat(lng));
+        formData.append('statut', 'en_attente');
+        if (photo) formData.append('photo', photo);
 
         fetch('/api/signalements/', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
+            body: formData
         })
         .then(r => r.json())
         .then(() => {
             document.getElementById('success-msg').style.display = 'block';
             window.scrollTo(0, 0);
+            lancerConfettis();
         })
         .catch(() => alert('Erreur lors de l\'envoi.'));
+    }
+
+    function lancerConfettis() {
+        const colors = ['#2e7d32', '#FFD700', '#ff6b6b', '#4ecdc4', '#45b7d1'];
+        for (let i = 0; i < 100; i++) {
+            const confetti = document.createElement('div');
+            confetti.style.cssText = `
+                position: fixed;
+                width: ${Math.random() * 10 + 5}px;
+                height: ${Math.random() * 10 + 5}px;
+                background: ${colors[Math.floor(Math.random() * colors.length)]};
+                left: ${Math.random() * 100}vw;
+                top: -20px;
+                border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+                z-index: 9999;
+                pointer-events: none;
+                animation: tomber ${Math.random() * 2 + 1}s linear forwards;
+            `;
+            document.body.appendChild(confetti);
+            setTimeout(() => confetti.remove(), 3000);
+        }
     }
 </script>
 

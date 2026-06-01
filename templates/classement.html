@@ -60,9 +60,7 @@
             background: #f0f0f0;
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            font-weight: bold;
-            font-size: 14px;
-            color: #555;
+            font-weight: bold; font-size: 14px; color: #555;
             flex-shrink: 0;
         }
         .rank-num.top3 { background: #2e7d32; color: white; }
@@ -73,13 +71,7 @@
         .points-display { text-align: right; }
         .points-value { font-size: 20px; font-weight: bold; color: #2e7d32; }
         .points-label { font-size: 11px; color: #aaa; }
-        .progress-bar {
-            height: 6px;
-            background: #f0f0f0;
-            border-radius: 3px;
-            margin-top: 6px;
-            width: 100px;
-        }
+        .progress-bar { height: 6px; background: #f0f0f0; border-radius: 3px; margin-top: 6px; width: 100px; }
         .progress-fill { height: 100%; background: #2e7d32; border-radius: 3px; }
         .mon-profil {
             background: white;
@@ -90,41 +82,58 @@
             border-left: 4px solid #2e7d32;
         }
         .mon-profil h3 { color: #2e7d32; margin-bottom: 15px; font-size: 16px; }
-        .profil-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-        }
-        .profil-stat {
-            text-align: center;
-            background: #f9f9f9;
-            border-radius: 10px;
-            padding: 15px;
-        }
+        .profil-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+        .profil-stat { text-align: center; background: #f9f9f9; border-radius: 10px; padding: 15px; }
         .profil-stat-value { font-size: 24px; font-weight: bold; color: #2e7d32; }
         .profil-stat-label { font-size: 12px; color: #888; margin-top: 4px; }
         .not-logged {
-            text-align: center;
-            padding: 20px;
-            background: #fff3e0;
-            border-radius: 10px;
-            margin-bottom: 25px;
+            text-align: center; padding: 20px;
+            background: #fff3e0; border-radius: 10px; margin-bottom: 25px;
         }
         .not-logged p { color: #e65100; margin-bottom: 10px; }
         .not-logged a {
-            background: #2e7d32;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 20px;
-            text-decoration: none;
-            font-size: 13px;
+            background: #2e7d32; color: white;
+            padding: 8px 20px; border-radius: 20px;
+            text-decoration: none; font-size: 13px;
         }
-        footer {
-            background: #1b5e20;
+        .carte-profil {
+            background: #2e7d32;
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 380px;
+            margin: 0 auto 15px;
             color: white;
-            padding: 20px;
             text-align: center;
-            margin-top: 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+        }
+        .carte-profil h3 { font-size: 22px; margin-bottom: 5px; }
+        .carte-profil p { opacity: 0.8; font-size: 13px; margin-bottom: 15px; }
+        .carte-points-box {
+            background: rgba(255,255,255,0.15);
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .carte-points-val { font-size: 36px; font-weight: bold; }
+        .carte-points-lbl { font-size: 13px; opacity: 0.8; }
+        .carte-badge { font-size: 24px; margin-bottom: 15px; }
+        .carte-url { background: rgba(255,255,255,0.1); border-radius: 8px; padding: 8px; font-size: 12px; opacity: 0.7; }
+        .btn-telecharger {
+            background: #2e7d32; color: white;
+            border: none; padding: 12px 30px;
+            border-radius: 25px; font-size: 14px;
+            font-weight: bold; cursor: pointer;
+            display: block; margin: 0 auto;
+        }
+        .btn-telecharger:hover { background: #1b5e20; }
+        footer { background: #1b5e20; color: white; padding: 20px; text-align: center; margin-top: 30px; }
+        @keyframes tomber {
+            0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+        @keyframes pulse-whatsapp {
+            0%, 100% { transform: scale(1); box-shadow: 0 4px 15px rgba(37,211,102,0.4); }
+            50% { transform: scale(1.1); box-shadow: 0 4px 25px rgba(37,211,102,0.6); }
         }
     </style>
 </head>
@@ -155,6 +164,7 @@
     </div>
 
     <div id="mon-profil-section"></div>
+    <div id="carte-profil-section" style="display:none;margin-bottom:25px;"></div>
     <div class="podium" id="podium"></div>
 
     <div class="classement-card">
@@ -165,11 +175,77 @@
     </div>
 </div>
 
+<!-- Bouton WhatsApp flottant -->
+<a href="https://wa.me/2250586359642?text=Bonjour%20AbidjanWaste%2C%20je%20souhaite%20signaler%20un%20problème%20de%20collecte."
+   target="_blank"
+   style="
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 56px;
+    height: 56px;
+    background: #25D366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(37,211,102,0.4);
+    z-index: 1000;
+    text-decoration: none;
+    font-size: 28px;
+    animation: pulse-whatsapp 2s infinite;
+   ">📱</a>
+
 <footer>
     <p>🗑️ <strong>AbidjanWaste</strong> — Abidjan plus propre, ensemble 🇨🇮</p>
 </footer>
 
 <script>
+function lancerConfettis() {
+    const colors = ['#2e7d32', '#FFD700', '#ff6b6b', '#4ecdc4', '#45b7d1'];
+    for (let i = 0; i < 100; i++) {
+        const confetti = document.createElement('div');
+        confetti.style.cssText = `
+            position: fixed;
+            width: ${Math.random() * 10 + 5}px;
+            height: ${Math.random() * 10 + 5}px;
+            background: ${colors[Math.floor(Math.random() * colors.length)]};
+            left: ${Math.random() * 100}vw;
+            top: -20px;
+            border-radius: ${Math.random() > 0.5 ? '50%' : '0'};
+            z-index: 9999;
+            pointer-events: none;
+            animation: tomber ${Math.random() * 2 + 1}s linear forwards;
+        `;
+        document.body.appendChild(confetti);
+        setTimeout(() => confetti.remove(), 3000);
+    }
+}
+
+function telechargerCarte(username, points, badge) {
+    lancerConfettis();
+    const contenu = `
+╔══════════════════════════════════════╗
+║         🗑️  ABIDJANWASTE             ║
+║      CARTE DE MEMBRE CITOYEN         ║
+╠══════════════════════════════════════╣
+║                                      ║
+║  Citoyen : ${username.padEnd(27)}║
+║  Points  : ${String(points).padEnd(27)}║
+║  Badge   : ${badge.padEnd(27)}║
+║                                      ║
+║  abidjanwaste.onrender.com           ║
+╚══════════════════════════════════════╝
+    `;
+    const blob = new Blob([contenu], {type: 'text/plain;charset=utf-8'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `carte-membre-${username}.txt`;
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
 async function charger() {
     const [classRes, profilRes] = await Promise.all([
         fetch('/api/classement/'),
@@ -179,6 +255,8 @@ async function charger() {
     const profil = await profilRes.json();
 
     const section = document.getElementById('mon-profil-section');
+    const carteSection = document.getElementById('carte-profil-section');
+
     if (profil.authenticated) {
         section.innerHTML = `
             <div class="mon-profil">
@@ -198,6 +276,27 @@ async function charger() {
                     </div>
                 </div>
             </div>`;
+
+        carteSection.style.display = 'block';
+        carteSection.innerHTML = `
+            <div class="carte-profil">
+                <div style="font-size:48px;margin-bottom:10px">🗑️</div>
+                <h3>${profil.username}</h3>
+                <p>Citoyen AbidjanWaste</p>
+                <div class="carte-points-box">
+                    <div class="carte-points-val">${profil.points}</div>
+                    <div class="carte-points-lbl">Points</div>
+                </div>
+                <div class="carte-badge">${profil.badge}</div>
+                <div class="carte-url">abidjanwaste.onrender.com</div>
+            </div>
+            <div style="text-align:center;">
+                <button class="btn-telecharger"
+                    onclick="telechargerCarte('${profil.username}', ${profil.points}, '${profil.badge}')">
+                    📥 Télécharger ma carte membre
+                </button>
+            </div>`;
+
     } else {
         section.innerHTML = `
             <div class="not-logged">
@@ -240,7 +339,7 @@ async function charger() {
                 <div class="points-value">${c.points}</div>
                 <div class="points-label">points</div>
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width:${Math.min(100, (c.points/maxPoints)*100)}%"></div>
+                    <div class="progress-fill" style="width:${Math.min(100,(c.points/maxPoints)*100)}%"></div>
                 </div>
             </div>
         </div>
