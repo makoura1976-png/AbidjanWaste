@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AbidjanWaste — Connexion</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; }
+        .auth-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+        }
+        .auth-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 24px rgba(0,0,0,0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 420px;
+        }
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .auth-logo h2 { color: #2e7d32; font-size: 24px; margin-bottom: 6px; }
+        .auth-logo p { color: #888; font-size: 14px; }
+        .form-group { margin-bottom: 18px; }
+        .form-label { display: block; font-weight: 600; margin-bottom: 6px; font-size: 14px; color: #444; }
+        .form-control {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            background: #fafafa;
+            transition: border-color 0.2s;
+        }
+        .form-control:focus { outline: none; border-color: #2e7d32; background: white; }
+        .btn-submit {
+            width: 100%;
+            background: #2e7d32;
+            color: white;
+            border: none;
+            padding: 13px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 8px;
+        }
+        .btn-submit:hover { background: #1b5e20; }
+        .auth-footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 13px;
+            color: #888;
+        }
+        .auth-footer a { color: #2e7d32; text-decoration: none; font-weight: 600; }
+        .error-msg {
+            background: #ffebee;
+            color: #c62828;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 16px;
+        }
+        .divider {
+            text-align: center;
+            color: #ccc;
+            margin: 20px 0;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="/" class="navbar-brand">
+        <div>
+            <h1>🗑️ AbidjanWaste</h1>
+            <p>Gestion intelligente des déchets</p>
+        </div>
+    </a>
+    <div class="navbar-nav">
+        <a href="/">🏠 Accueil</a>
+        <a href="/carte/">🗺️ Carte</a>
+        <a href="/login/" class="active">🔐 Connexion</a>
+    </div>
+</nav>
+
+<div class="auth-container">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div style="font-size:48px;margin-bottom:10px">🗑️</div>
+            <h2>Connexion</h2>
+            <p>Accédez à votre espace citoyen</p>
+        </div>
+
+        <div id="error-msg" class="error-msg" style="display:none"></div>
+
+        <div class="form-group">
+            <label class="form-label">Nom d'utilisateur</label>
+            <input type="text" id="username" class="form-control" placeholder="Votre nom d'utilisateur">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Mot de passe</label>
+            <input type="password" id="password" class="form-control" placeholder="Votre mot de passe">
+        </div>
+
+        <button class="btn-submit" onclick="seConnecter()">🔐 Se connecter</button>
+
+        <div class="divider">— ou —</div>
+
+        <div class="auth-footer">
+            Pas encore de compte ? <a href="/register/">Créer un compte</a>
+        </div>
+    </div>
+</div>
+
+<script>
+function seConnecter() {
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    if (!username || !password) {
+        afficherErreur('Veuillez remplir tous les champs.');
+        return;
+    }
+
+    fetch('/api/auth/login/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    })
+    .then(r => r.json())
+    .then(data => {
+        if (data.success) {
+            window.location.href = '/';
+        } else {
+            afficherErreur(data.error || 'Identifiants incorrects.');
+        }
+    })
+    .catch(() => afficherErreur('Erreur de connexion.'));
+}
+
+function afficherErreur(msg) {
+    const el = document.getElementById('error-msg');
+    el.textContent = msg;
+    el.style.display = 'block';
+}
+
+document.addEventListener('keypress', e => {
+    if (e.key === 'Enter') seConnecter();
+});
+</script>
+
+</body>
+</html>
